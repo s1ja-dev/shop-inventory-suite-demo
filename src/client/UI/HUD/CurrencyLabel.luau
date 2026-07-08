@@ -7,6 +7,7 @@ local Theme = require(script.Parent.Parent.Parent.Theme)
 
 export type CurrencyLabelOptions = {
 	Caption: string,
+	IconId: string?,
 	AccentColor: Color3?,
 	Size: UDim2?,
 	LayoutOrder: number?,
@@ -37,14 +38,31 @@ function CurrencyLabel.new(options: CurrencyLabelOptions): (Frame, TextLabel)
 	stroke.Color = accent
 	stroke.Parent = frame
 
-	local padding = Instance.new("UIPadding")
-	padding.PaddingLeft = UDim.new(0, 10)
-	padding.PaddingRight = UDim.new(0, 10)
-	padding.Parent = frame
+	-- Only added once an icon has actually been uploaded — leaves the plain
+	-- text-only chip as the fallback. No UIPadding here on purpose: it
+	-- insets EVERY child equally, including the icon itself, which pushed
+	-- the icon to the right until it landed on top of the value text
+	-- instead of before it — confirmed live. Explicit offsets for both the
+	-- icon and the text labels avoid that entirely.
+	local hasIcon = options.IconId ~= nil and options.IconId ~= ""
+	if hasIcon then
+		local icon = Instance.new("ImageLabel")
+		icon.Name = "Icon"
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 10, 0.5, 0)
+		icon.Size = UDim2.fromOffset(26, 26)
+		icon.BackgroundTransparency = 1
+		icon.Image = options.IconId :: string
+		icon.ZIndex = 2
+		icon.Parent = frame
+	end
+
+	local leftInset = if hasIcon then 44 else 10
 
 	local caption = Instance.new("TextLabel")
 	caption.Name = "Caption"
-	caption.Size = UDim2.new(1, 0, 0.38, 0)
+	caption.Position = UDim2.fromOffset(leftInset, 0)
+	caption.Size = UDim2.new(1, -(leftInset + 10), 0.38, 0)
 	caption.BackgroundTransparency = 1
 	caption.Text = string.upper(options.Caption)
 	caption.TextColor3 = Theme.TextMuted
@@ -55,8 +73,8 @@ function CurrencyLabel.new(options: CurrencyLabelOptions): (Frame, TextLabel)
 
 	local value = Instance.new("TextLabel")
 	value.Name = "Value"
-	value.Size = UDim2.new(1, 0, 0.62, 0)
-	value.Position = UDim2.fromScale(0, 0.38)
+	value.Position = UDim2.new(0, leftInset, 0.38, 0)
+	value.Size = UDim2.new(1, -(leftInset + 10), 0.62, 0)
 	value.BackgroundTransparency = 1
 	value.Text = "0"
 	value.TextColor3 = accent

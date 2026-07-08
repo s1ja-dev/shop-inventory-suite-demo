@@ -6,6 +6,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SettingsConfig = require(ReplicatedStorage.Shared.Config.SettingsConfig)
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
 
 local ClientRoot = script.Parent.Parent.Parent
 local Theme = require(ClientRoot.Theme)
@@ -36,6 +37,7 @@ function SettingsUI.Init(screenGui: ScreenGui): Frame
 	padding.Parent = body
 
 	local toggleButtons: { [string]: TextButton } = {}
+	local toggleIcons: { [string]: ImageLabel } = {}
 
 	local function applyState(settingId: string, enabled: boolean)
 		local button = toggleButtons[settingId]
@@ -44,6 +46,17 @@ function SettingsUI.Init(screenGui: ScreenGui): Frame
 		end
 		button.Text = if enabled then "ON" else "OFF"
 		button.BackgroundColor3 = if enabled then Theme.Success else Theme.ChipBackground
+
+		-- Only updated once icons have actually been uploaded (see
+		-- IconAssets) — the ON/OFF text above already conveys state either
+		-- way.
+		local icon = toggleIcons[settingId]
+		if icon then
+			local iconId = if enabled then IconAssets.ToggleOn else IconAssets.ToggleOff
+			if iconId ~= "" then
+				icon.Image = iconId
+			end
+		end
 	end
 
 	for index, setting in SettingsConfig.GetAllInOrder() do
@@ -69,8 +82,9 @@ function SettingsUI.Init(screenGui: ScreenGui): Frame
 		label.TextXAlignment = Enum.TextXAlignment.Left
 		label.Parent = row
 
-		local toggleButton, toggleClicked = ButtonComponent.new({
+		local toggleButton, toggleClicked, toggleIcon = ButtonComponent.new({
 			Text = if setting.Default then "ON" else "OFF",
+			IconId = if setting.Default then IconAssets.ToggleOn else IconAssets.ToggleOff,
 			Size = UDim2.fromOffset(70, 32),
 			AnchorPoint = Vector2.new(1, 0.5),
 			Position = UDim2.new(1, -8, 0.5, 0),
@@ -78,6 +92,9 @@ function SettingsUI.Init(screenGui: ScreenGui): Frame
 			Parent = row,
 		})
 		toggleButtons[setting.Id] = toggleButton
+		if toggleIcon then
+			toggleIcons[setting.Id] = toggleIcon
+		end
 
 		toggleClicked:Connect(function()
 			InputController.ToggleSetting(setting.Id)

@@ -3,6 +3,9 @@
 -- panels. Subscribes to StateController only for server-authoritative
 -- state — never touches remotes directly.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
+
 local ClientRoot = script.Parent.Parent.Parent
 local Theme = require(ClientRoot.Theme)
 local StateController = require(ClientRoot.Controllers.StateController)
@@ -25,6 +28,7 @@ function HUDController.Init(screenGui: ScreenGui, onOpenShop: () -> (), onOpenIn
 
 	local _, coinsValueLabel = CurrencyLabel.new({
 		Caption = "Coins",
+		IconId = IconAssets.Coin,
 		AccentColor = Theme.Warning,
 		Position = UDim2.fromOffset(16, 16),
 		Parent = root,
@@ -35,6 +39,7 @@ function HUDController.Init(screenGui: ScreenGui, onOpenShop: () -> (), onOpenIn
 	-- without a real Robux purchase.
 	local _, debugAddClicked = ButtonComponent.new({
 		Text = "+100 Coins",
+		IconId = IconAssets.Coin,
 		Size = UDim2.fromOffset(180, 36),
 		Position = UDim2.fromOffset(16, 72),
 		BackgroundColor = Theme.Success,
@@ -59,6 +64,7 @@ function HUDController.Init(screenGui: ScreenGui, onOpenShop: () -> (), onOpenIn
 
 	local shopButton, shopClicked = ButtonComponent.new({
 		Text = "Shop",
+		IconId = IconAssets.Shop,
 		Size = UDim2.fromOffset(120, 48),
 		BackgroundColor = Theme.Shop,
 		LayoutOrder = 1,
@@ -68,6 +74,7 @@ function HUDController.Init(screenGui: ScreenGui, onOpenShop: () -> (), onOpenIn
 
 	local inventoryButton, inventoryClicked = ButtonComponent.new({
 		Text = "Inventory",
+		IconId = IconAssets.Inventory,
 		Size = UDim2.fromOffset(120, 48),
 		BackgroundColor = Theme.Premium,
 		LayoutOrder = 2,
@@ -77,6 +84,7 @@ function HUDController.Init(screenGui: ScreenGui, onOpenShop: () -> (), onOpenIn
 
 	local settingsButton, settingsClicked = ButtonComponent.new({
 		Text = "Settings",
+		IconId = IconAssets.Settings,
 		Size = UDim2.fromOffset(120, 48),
 		BackgroundColor = Theme.Info,
 		LayoutOrder = 3,

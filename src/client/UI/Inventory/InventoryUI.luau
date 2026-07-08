@@ -6,6 +6,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemConfig = require(ReplicatedStorage.Shared.Config.ItemConfig)
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
 
 local ClientRoot = script.Parent.Parent.Parent
 local Theme = require(ClientRoot.Theme)
@@ -17,6 +18,13 @@ local RARITY_COLORS: { [string]: Color3 } = {
 	Uncommon = Theme.Success,
 	Rare = Theme.Info,
 	Epic = Theme.Premium,
+}
+
+local ITEM_ICONS: { [string]: string } = {
+	wooden_sword = IconAssets.Sword,
+	iron_shield = IconAssets.Shield,
+	speed_potion = IconAssets.Potion,
+	golden_crown = IconAssets.Crown,
 }
 
 local InventoryUI = {}
@@ -85,9 +93,23 @@ function InventoryUI.Init(screenGui: ScreenGui): Frame
 			rowStroke.Color = RARITY_COLORS[rarity] or Theme.Info
 			rowStroke.Parent = row
 
+			-- Only added once an icon has actually been uploaded (see
+			-- IconAssets) — leaves the plain text-only row as the fallback.
+			local iconId = ITEM_ICONS[itemId]
+			local hasIcon = iconId ~= nil and iconId ~= ""
+			if hasIcon then
+				local icon = Instance.new("ImageLabel")
+				icon.AnchorPoint = Vector2.new(0, 0.5)
+				icon.Position = UDim2.new(0, 8, 0.5, 0)
+				icon.Size = UDim2.fromOffset(28, 28)
+				icon.BackgroundTransparency = 1
+				icon.Image = iconId :: string
+				icon.Parent = row
+			end
+
 			local label = Instance.new("TextLabel")
-			label.Size = UDim2.new(1, -70, 1, 0)
-			label.Position = UDim2.fromOffset(10, 0)
+			label.Size = UDim2.new(1, if hasIcon then -108 else -70, 1, 0)
+			label.Position = UDim2.fromOffset(if hasIcon then 46 else 10, 0)
 			label.BackgroundTransparency = 1
 			label.Text = displayName
 			label.TextColor3 = Theme.TextLight

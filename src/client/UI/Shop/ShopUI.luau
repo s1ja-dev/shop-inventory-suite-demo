@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemConfig = require(ReplicatedStorage.Shared.Config.ItemConfig)
 local ProductConfig = require(ReplicatedStorage.Shared.Config.ProductConfig)
 local ActiveBuffConfig = require(ReplicatedStorage.Shared.Config.ActiveBuffConfig)
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
 
 local ClientRoot = script.Parent.Parent.Parent
 local Theme = require(ClientRoot.Theme)
@@ -26,6 +27,19 @@ local BUFF_COLORS: { [string]: Color3 } = {
 	SpeedBoost = Theme.Success,
 	JumpBoost = Theme.Info,
 	CoinX2 = Theme.Warning,
+}
+
+local BUFF_ICONS: { [string]: string } = {
+	SpeedBoost = IconAssets.Speed,
+	JumpBoost = IconAssets.Jump,
+	CoinX2 = IconAssets.CoinX2,
+}
+
+local ITEM_ICONS: { [string]: string } = {
+	wooden_sword = IconAssets.Sword,
+	iron_shield = IconAssets.Shield,
+	speed_potion = IconAssets.Potion,
+	golden_crown = IconAssets.Crown,
 }
 
 local ShopUI = {}
@@ -47,6 +61,7 @@ end
 local function buyRow(options: {
 	Text: string,
 	ButtonText: string,
+	IconId: string?,
 	AccentColor: Color3,
 	LayoutOrder: number,
 	Parent: Instance,
@@ -68,9 +83,22 @@ local function buyRow(options: {
 	rowStroke.Color = options.AccentColor
 	rowStroke.Parent = row
 
+	-- Only added once an icon has actually been uploaded (see IconAssets) —
+	-- leaves the plain text-only row as the fallback.
+	local hasIcon = options.IconId ~= nil and options.IconId ~= ""
+	if hasIcon then
+		local icon = Instance.new("ImageLabel")
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 10, 0.5, 0)
+		icon.Size = UDim2.fromOffset(28, 28)
+		icon.BackgroundTransparency = 1
+		icon.Image = options.IconId :: string
+		icon.Parent = row
+	end
+
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(0.55, 0, 1, 0)
-	label.Position = UDim2.fromOffset(10, 0)
+	label.Size = UDim2.new(0.55, if hasIcon then -38 else 0, 1, 0)
+	label.Position = UDim2.fromOffset(if hasIcon then 48 else 10, 0)
 	label.BackgroundTransparency = 1
 	label.Text = options.Text
 	label.TextColor3 = Theme.TextLight
@@ -124,6 +152,7 @@ function ShopUI.Init(screenGui: ScreenGui): Frame
 		buyRow({
 			Text = `{item.Name} ({item.Rarity})`,
 			ButtonText = `{item.ShopPriceCoins} Coins`,
+			IconId = ITEM_ICONS[item.Id],
 			AccentColor = RARITY_COLORS[item.Rarity] or Theme.Info,
 			LayoutOrder = index,
 			Parent = scroll,
@@ -139,6 +168,7 @@ function ShopUI.Init(screenGui: ScreenGui): Frame
 		buyRow({
 			Text = `{buff.Name} ({buff.Description})`,
 			ButtonText = `{buff.PriceCoins} Coins`,
+			IconId = BUFF_ICONS[buff.Id],
 			AccentColor = BUFF_COLORS[buff.Id] or Theme.Info,
 			LayoutOrder = 50 + index,
 			Parent = scroll,
@@ -154,6 +184,7 @@ function ShopUI.Init(screenGui: ScreenGui): Frame
 		buyRow({
 			Text = `{product.Name} (+{product.CoinAmount})`,
 			ButtonText = `{product.RobuxPrice} R$`,
+			IconId = IconAssets.Gem,
 			AccentColor = Theme.Premium,
 			LayoutOrder = 100 + index,
 			Parent = scroll,

@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NetConstants = require(ReplicatedStorage.Shared.Net.NetConstants)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local ActiveBuffConfig = require(ReplicatedStorage.Shared.Config.ActiveBuffConfig)
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
 
 local ClientRoot = script.Parent.Parent
 local Theme = require(ClientRoot.Theme)
@@ -17,6 +18,12 @@ local BUFF_COLORS: { [string]: Color3 } = {
 	SpeedBoost = Theme.Success,
 	JumpBoost = Theme.Info,
 	CoinX2 = Theme.Warning,
+}
+
+local BUFF_ICONS: { [string]: string } = {
+	SpeedBoost = IconAssets.Speed,
+	JumpBoost = IconAssets.Jump,
+	CoinX2 = IconAssets.CoinX2,
 }
 
 type BuffChangedData = {
@@ -87,16 +94,28 @@ function BuffTimerUI.Init(screenGui: ScreenGui)
 		TweenService:Create(scale, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 })
 			:Play()
 
-		local labelText = Instance.new("TextLabel")
-		labelText.Size = UDim2.new(1, 0, 0.5, 0)
-		labelText.BackgroundTransparency = 1
-		labelText.Text = shortLabel
-		labelText.TextColor3 = Theme.TextLight
-		labelText.TextStrokeColor3 = Color3.new(0, 0, 0)
-		labelText.TextStrokeTransparency = 0.4
-		labelText.Font = Enum.Font.GothamBlack
-		labelText.TextScaled = true
-		labelText.Parent = badge
+		-- Icon replaces the short-label text once an icon has actually been
+		-- uploaded for this buff (see IconAssets) — falls back to the
+		-- abbreviation text otherwise.
+		local iconId = BUFF_ICONS[buffId]
+		if iconId and iconId ~= "" then
+			local icon = Instance.new("ImageLabel")
+			icon.Size = UDim2.fromScale(1, 0.5)
+			icon.BackgroundTransparency = 1
+			icon.Image = iconId
+			icon.Parent = badge
+		else
+			local labelText = Instance.new("TextLabel")
+			labelText.Size = UDim2.new(1, 0, 0.5, 0)
+			labelText.BackgroundTransparency = 1
+			labelText.Text = shortLabel
+			labelText.TextColor3 = Theme.TextLight
+			labelText.TextStrokeColor3 = Color3.new(0, 0, 0)
+			labelText.TextStrokeTransparency = 0.4
+			labelText.Font = Enum.Font.GothamBlack
+			labelText.TextScaled = true
+			labelText.Parent = badge
+		end
 
 		local countdownText = Instance.new("TextLabel")
 		countdownText.Size = UDim2.new(1, 0, 0.5, 0)
