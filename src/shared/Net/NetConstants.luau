@@ -15,6 +15,11 @@ local NetConstants = {
 	InventoryChanged = "InventoryChanged",
 	CurrencyChanged = "CurrencyChanged",
 
+	-- Fired instead of silently no-op'ing whenever a buy request (item or
+	-- buff) fails a server-side check, so the client can show a toast instead
+	-- of leaving the player guessing why nothing happened.
+	PurchaseFailed = "PurchaseFailed",
+
 	RequestPromptRobuxPurchase = "RequestPromptRobuxPurchase",
 
 	RequestToggleSetting = "RequestToggleSetting",

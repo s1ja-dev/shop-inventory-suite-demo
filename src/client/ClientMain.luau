@@ -7,6 +7,7 @@ local ShopUI = require(script.Parent.UI.Shop.ShopUI)
 local InventoryUI = require(script.Parent.UI.Inventory.InventoryUI)
 local SettingsUI = require(script.Parent.UI.Settings.SettingsUI)
 local BuffTimerUI = require(script.Parent.UI.BuffTimerUI)
+local ToastUI = require(script.Parent.UI.ToastUI)
 
 local ClientMain = {}
 
@@ -32,6 +33,7 @@ function ClientMain.Start()
 	local inventoryPanel = InventoryUI.Init(screenGui)
 	local settingsPanel = SettingsUI.Init(screenGui)
 	BuffTimerUI.Init(screenGui)
+	ToastUI.Init(screenGui)
 
 	HUDController.Init(screenGui, function()
 		togglePanel(shopPanel, { inventoryPanel, settingsPanel })

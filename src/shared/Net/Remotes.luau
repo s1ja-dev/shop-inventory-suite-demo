@@ -16,6 +16,7 @@ local REMOTE_KINDS: { [string]: RemoteKind } = {
 	[NetConstants.RequestBuyItem] = "RemoteEvent",
 	[NetConstants.InventoryChanged] = "RemoteEvent",
 	[NetConstants.CurrencyChanged] = "RemoteEvent",
+	[NetConstants.PurchaseFailed] = "RemoteEvent",
 	[NetConstants.RequestPromptRobuxPurchase] = "RemoteEvent",
 	[NetConstants.RequestToggleSetting] = "RemoteEvent",
 	[NetConstants.SettingsChanged] = "RemoteEvent",

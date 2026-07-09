@@ -25,6 +25,10 @@ local function fireCurrencyChanged(player: Player)
 	Remotes.GetEvent(NetConstants.CurrencyChanged):FireClient(player, profile.Currency)
 end
 
+local function firePurchaseFailed(player: Player, reason: string)
+	Remotes.GetEvent(NetConstants.PurchaseFailed):FireClient(player, { Reason = reason })
+end
+
 function ShopService.AddCoins(player: Player, amount: number)
 	local profile = DataService.GetProfile(player)
 	if not profile then
@@ -53,9 +57,11 @@ local function onRequestBuyItem(player: Player, itemId: any)
 	end
 
 	if profile.Currency.Coins < item.ShopPriceCoins then
+		firePurchaseFailed(player, "NotEnoughCoins")
 		return
 	end
 	if not InventoryService.HasCapacity(player, itemId, 1) then
+		firePurchaseFailed(player, "InventoryFull")
 		return
 	end
 

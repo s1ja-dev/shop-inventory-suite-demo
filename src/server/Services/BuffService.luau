@@ -118,6 +118,7 @@ local function onRequestBuyBuff(player: Player, buffId: any)
 	end
 
 	if profile.Currency.Coins < buff.PriceCoins then
+		Remotes.GetEvent(NetConstants.PurchaseFailed):FireClient(player, { Reason = "NotEnoughCoins" })
 		return
 	end
 
